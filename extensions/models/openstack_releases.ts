@@ -223,8 +223,17 @@ export function parseDeliverable(
   let doc: unknown;
   try {
     doc = parseYaml(yamlText, { schema: "failsafe" });
-  } catch {
-    doc = null;
+  } catch (e) {
+    // Only tolerate a genuine YAML *syntax* error (one malformed deliverable
+    // file degrades to an empty entry). Any other error — notably a Deno
+    // permission error (yaml@2 touches process.env at parse time, needing
+    // --allow-env) — must fail loud: swallowing it here would silently degrade
+    // EVERY deliverable to an empty, schema-valid-but-wrong snapshot.
+    if ((e as Error)?.name === "YAMLParseError") {
+      doc = null;
+    } else {
+      throw e;
+    }
   }
   const d = (doc ?? {}) as {
     releases?: Array<
@@ -576,7 +585,7 @@ export async function buildSnapshot(
 /** Read-only OpenStack upstream release-facts snapshot model. */
 export const model = {
   type: "@kneel/openstack-releases",
-  version: "2026.07.24.1",
+  version: "2026.09.29.1",
   description:
     "Read-only snapshot of upstream OpenStack release facts for one series: " +
     "enumerates deliverables/<series>/*.yaml and deliverables/_independent/*.yaml " +
