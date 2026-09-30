@@ -1,0 +1,31 @@
+manifestVersion: 1
+name: "@kneel/openstack-releases"
+version: "2026.09.29.1"
+description: "Read-only snapshot of upstream OpenStack release facts for one series: enumerates deliverables/<series>/*.yaml and deliverables/_independent/*.yaml on opendev.org, records each deliverable's newest version (rpmvercmp, with a file-order cross-check) and shipping repos — the upstream side of a SIG dist-git gap comparison."
+
+repository: https://github.com/NeilHanlon/swamp-openstack-releases
+
+additionalFiles:
+  - README.md
+  - LICENSE.txt
+
+# openstack_releases.ts is the series-scoped model. It imports one pure library
+# module bundled with it — extensions/lib/rpmvercmp.ts (RPM version comparison) —
+# which is not a separately-registered model type.
+#
+# Runtime permissions: the snapshot is plain Deno `fetch` against opendev.org and
+# needs `--allow-net`.
+models:
+  - openstack_releases.ts
+
+platforms:
+  - linux-x86_64
+  - linux-aarch64
+  - darwin-x86_64
+  - darwin-aarch64
+
+labels:
+  - openstack
+  - rdo
+  - releases
+  - opendev
